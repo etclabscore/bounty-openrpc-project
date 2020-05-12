@@ -5,13 +5,10 @@
   "author": "Haben Amare <haben.amare@outlook.com>",
   "license": "Apache-2.0",
   "scripts": {
-    "debug": "tsc -p ./ && node out/server.js --stdio",
+    "debug": "tsc -p ./ && node build/main.js",
     "build": "tsc -p ./"
   },
-  "dependencies": {
-    "vscode-languageserver": "^6.1.1",
-    "vscode-languageserver-textdocument": "^1.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^13.13.5",
     "typescript": "^3.8.3"

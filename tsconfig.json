@@ -9,7 +9,7 @@
     "strict": true,
     "sourceMap": true,
     "rootDir": "src",
-    "outDir": "build",
+    "outDir": "build"
   },
   "exclude": [
     "node_modules"
