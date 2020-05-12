@@ -4,7 +4,10 @@
   "description": "an implementation of the Language Server Protocol for OpenRPC",
   "author": "Haben Amare <haben.amare@outlook.com>",
   "license": "Apache-2.0",
-  "scripts": {},
+  "scripts": {
+    "debug": "tsc -p ./ && node out/server.js --stdio",
+    "build": "tsc -p ./"
+  },
   "dependencies": {
     "vscode-languageserver": "^6.1.1",
     "vscode-languageserver-textdocument": "^1.0.1"
