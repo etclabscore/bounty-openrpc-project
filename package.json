@@ -16,6 +16,7 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
+    "ajv": "^6.12.2",
     "tslib": "^1"
   },
   "devDependencies": {
