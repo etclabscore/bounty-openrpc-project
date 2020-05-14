@@ -12,7 +12,7 @@ const ajv = new Ajv({
 const ajvValidate = ajv.compile(openRpcSchema);
 
 const openrpcValidate = (
-  data: object
+  data: any
 ): { valid: boolean; errors: Ajv.ErrorObject[]; hasErrors: boolean } => {
   const valid = ajvValidate(data);
 
