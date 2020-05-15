@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Command, flags } from '@oclif/command';
 
+import { log } from '../logger';
 import { openrpcValidate } from '../openrpc-validator';
 
 export default class Validate extends Command {
@@ -29,23 +30,29 @@ export default class Validate extends Command {
       const file = fs.readFileSync(filePath);
       fileContent = file.toString();
     } catch (error) {
-      console.log(error);
-      this.error('File could not be read.');
+      if (error?.code === 'ENOENT') {
+        log.error('File not found.');
+        this.exit(1);
+      }
+
+      log.error('File could not be read.');
+      this.exit(1);
     }
 
     let parsedFileContent: any;
     try {
       parsedFileContent = JSON.parse(fileContent);
     } catch (error) {
-      this.error(`File doesn't contain valid JSON`);
+      log.error(`File doesn't contain valid JSON.`);
+      this.exit(1);
     }
 
     const result = openrpcValidate(parsedFileContent);
     if (result.hasErrors) {
       console.log(result.errors);
-    } else {
-      this.log(`Valid!`);
-      this.log(`   [${path.basename(filePath)}]`);
+      this.exit(1);
     }
+
+    log.success('Valid!');
   }
 }
