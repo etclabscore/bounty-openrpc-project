@@ -22,6 +22,10 @@ export default class Bundle extends Command {
       helpValue: '<file>',
       description: 'place the output into <file>',
     }),
+    substitute: flags.boolean({
+      char: 's',
+      description: 'substitute $ref pointers with their resolved value',
+    }),
   };
 
   static args = [{ name: 'file', required: true }];
@@ -39,9 +43,6 @@ export default class Bundle extends Command {
     const outputFileName = path.basename(outputPath);
 
     // TODO: Set the output format
-
-    // TODO: Ask whether $ref pointers should be substitued to their resolved
-    //       value.
 
     try {
       // If the output file already exists, confirm overwrite.
@@ -73,7 +74,8 @@ export default class Bundle extends Command {
       const jsonFile = readJsonFile(filePath);
 
       // Parse the specified file and write result to file
-      const parsedOpenRpc = await openrpcParse(jsonFile, false);
+      const substituteRefs = flags.substitute ? true : false;
+      const parsedOpenRpc = await openrpcParse(jsonFile, substituteRefs);
       const result = JSON.stringify(parsedOpenRpc, null, 2);
       writeToFile(outputPath, result);
 
