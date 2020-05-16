@@ -2,6 +2,7 @@ import * as path from 'path';
 
 import { Command, flags } from '@oclif/command';
 import * as Inquirer from 'inquirer';
+import * as JsYaml from 'js-yaml';
 
 import { readJsonFile, fileAlreadyExists, writeToFile } from '../file-utils';
 import { styledString, log } from '../logger';
@@ -22,6 +23,12 @@ export default class Bundle extends Command {
       helpValue: '<file>',
       description: 'place the output into <file>',
     }),
+    format: flags.string({
+      default: 'json',
+      options: ['json', 'yaml'],
+      char: 'f',
+      description: 'the output format',
+    }),
     substitute: flags.boolean({
       char: 's',
       description: 'substitute $ref pointers with their resolved value',
@@ -41,8 +48,6 @@ export default class Bundle extends Command {
       ? path.join(process.cwd(), flags.output)
       : path.join(process.cwd(), fileName);
     const outputFileName = path.basename(outputPath);
-
-    // TODO: Set the output format
 
     try {
       // If the output file already exists, confirm overwrite.
@@ -73,10 +78,20 @@ export default class Bundle extends Command {
       // Read the specified file
       const jsonFile = readJsonFile(filePath);
 
-      // Parse the specified file and write result to file
+      // Parse the specified file
       const substituteRefs = flags.substitute ? true : false;
       const parsedOpenRpc = await openrpcParse(jsonFile, substituteRefs);
-      const result = JSON.stringify(parsedOpenRpc, null, 2);
+
+      // Produce final result based on output format
+      const outputFormat = flags.format;
+      let result;
+      if (outputFormat === 'json') {
+        result = JSON.stringify(parsedOpenRpc, null, 2);
+      } else {
+        result = JsYaml.dump(parsedOpenRpc, { noRefs: true });
+      }
+
+      // Write result to output file
       writeToFile(outputPath, result);
 
       log.success(`Document written to ${outputFileName}`);
