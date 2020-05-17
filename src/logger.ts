@@ -1,5 +1,6 @@
 import * as chalk from 'chalk';
 
+const infoString = chalk.bold.blueBright;
 const successString = chalk.bold.greenBright;
 const warnString = chalk.bold.yellow;
 const errorString = chalk.bold.redBright;
@@ -17,6 +18,9 @@ const log = {
 };
 
 const styledString = {
+  info(text: string): string {
+    return infoString(text);
+  },
   warning(text: string): string {
     return warnString(text);
   },
