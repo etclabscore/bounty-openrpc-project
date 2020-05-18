@@ -32,8 +32,17 @@ export default class Validate extends Command {
 
       const result = openrpcValidate(jsonContent);
       if (result.hasErrors) {
-        console.log(result.errors);
-        this.exit(1);
+        const errors = result.errors.map(e => {
+          return {
+            '@': e.dataPath,
+            message: e.message,
+          };
+        });
+
+        log.warn('Validation Errors:');
+        console.table(errors);
+
+        log.error('Invalid!');
       }
 
       log.success('Valid!');
