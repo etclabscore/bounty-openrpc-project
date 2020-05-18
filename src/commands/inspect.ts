@@ -133,7 +133,9 @@ export default class Inspect extends Command {
     let methodName: string;
     const paramValues: any[] = [];
     try {
-      // Change the current working directory to the directory of the specified file.
+      // Change the current working directory to the directory of the specified
+      // file. This is necessary for resolving $ref pointers that reference
+      // schemas inside other files.
       process.chdir(path.dirname(filePath));
 
       // Read the specified file

@@ -79,7 +79,9 @@ export default class Bundle extends Command {
         }
       }
 
-      // Change the current working directory to the directory of the specified file
+      // Change the current working directory to the directory of the specified
+      // file. This is necessary for resolving $ref pointers that reference
+      // schemas inside other files.
       process.chdir(path.dirname(filePath));
 
       //== Read the specified file
