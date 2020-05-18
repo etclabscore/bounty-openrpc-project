@@ -84,8 +84,21 @@ export default class Bundle extends Command {
       const substituteRefs = flags.substitute ? true : false;
       const parsedOpenRpc = await openrpcParse(jsonFile, substituteRefs);
 
+      //== Determine the output format
+      let outputFormat = flags.format;
+
+      // If the output flag is provided and if the output file's extension is
+      // either '.yaml' or '.yml', change the output format to YAML.
+      if (flags.output) {
+        const outputFileExtension = path.extname(outputPath);
+
+        if (['.yaml', '.yml'].includes(outputFileExtension)) {
+          outputFormat = 'yaml';
+        }
+      }
+      //==
+
       // Produce final result based on output format
-      const outputFormat = flags.format;
       let result;
       if (outputFormat === 'json') {
         result = JSON.stringify(parsedOpenRpc, null, 2);
