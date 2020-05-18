@@ -45,7 +45,7 @@ export default class Bundle extends Command {
   async run(): Promise<void> {
     const { args, flags } = this.parse(Bundle);
 
-    const filePath = path.join(process.cwd(), args.file);
+    const filePath = path.resolve(args.file);
 
     // Set the output path
     const outputPath = flags.output

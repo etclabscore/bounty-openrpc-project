@@ -127,7 +127,7 @@ export default class Inspect extends Command {
   async run(): Promise<void> {
     const { args } = this.parse(Inspect);
 
-    const filePath = path.join(process.cwd(), args.file);
+    const filePath = path.resolve(args.file);
 
     let client: Client;
     let methodName: string;

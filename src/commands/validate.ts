@@ -23,7 +23,7 @@ export default class Validate extends Command {
   async run(): Promise<void> {
     const { args } = this.parse(Validate);
 
-    const filePath = path.join(process.cwd(), args.file);
+    const filePath = path.resolve(args.file);
 
     let fileContent: string;
     try {
