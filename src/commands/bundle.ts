@@ -43,15 +43,17 @@ export default class Bundle extends Command {
     const filePath = path.join(process.cwd(), args.file);
 
     // Set the output path
-    const fileName = path.basename(filePath);
     const outputPath = flags.output
       ? path.join(process.cwd(), flags.output)
-      : path.join(process.cwd(), fileName);
+      : '';
     const outputFileName = path.basename(outputPath);
+
+    // Output to 'stdout' if the output flag is not provided
+    const outputToStdout = outputPath === '';
 
     try {
       // If the output file already exists, confirm overwrite.
-      if (fileAlreadyExists(outputPath)) {
+      if (!outputToStdout && fileAlreadyExists(outputPath)) {
         const { overwriteFile } = await Inquirer.prompt([
           {
             name: 'overwriteFile',
@@ -91,8 +93,12 @@ export default class Bundle extends Command {
         result = JsYaml.dump(parsedOpenRpc, { noRefs: true });
       }
 
-      // Write result to output file
-      writeToFile(outputPath, result);
+      // Write result to stdout or to the output file
+      if (outputToStdout) {
+        console.log(result);
+      } else {
+        writeToFile(outputPath, result);
+      }
 
       log.success(`Document written to ${outputFileName}`);
     } catch (error) {
