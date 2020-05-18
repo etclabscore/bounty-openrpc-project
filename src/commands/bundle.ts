@@ -132,7 +132,9 @@ export default class Bundle extends Command {
         writeToFile(outputPath, result);
       }
 
-      log.success(`Document written to ${outputFileName}`);
+      if (!outputToStdout) {
+        log.success(`Document written to ${outputFileName}`);
+      }
     } catch (error) {
       if (error?.isTtyError) {
         log.error('Prompt rendering failed.');
