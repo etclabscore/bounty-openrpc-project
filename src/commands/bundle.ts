@@ -4,7 +4,12 @@ import { Command, flags } from '@oclif/command';
 import * as Inquirer from 'inquirer';
 import * as JsYaml from 'js-yaml';
 
-import { readJsonFile, fileAlreadyExists, writeToFile } from '../file-utils';
+import {
+  readJsonFile,
+  fileAlreadyExists,
+  writeToFile,
+  readYamlFileAsJson,
+} from '../file-utils';
 import { styledString, log } from '../logger';
 import { openrpcParse } from '../openrpc-parser';
 
@@ -77,12 +82,24 @@ export default class Bundle extends Command {
       // Change the current working directory to the directory of the specified file
       process.chdir(path.dirname(filePath));
 
-      // Read the specified file
-      const jsonFile = readJsonFile(filePath);
+      //== Read the specified file
+      let jsonContent;
+      const inputFileExtension = path.extname(filePath);
+      switch (inputFileExtension) {
+        // If the input file's extension is either '.yaml' or '.yml', load the
+        // input file as YAML and convert it to JSON.
+        case '.yaml':
+        case '.yml':
+          jsonContent = readYamlFileAsJson(filePath);
+          break;
+        default:
+          jsonContent = readJsonFile(filePath);
+      }
+      //==
 
       // Parse the specified file
       const substituteRefs = flags.substitute ? true : false;
-      const parsedOpenRpc = await openrpcParse(jsonFile, substituteRefs);
+      const parsedOpenRpc = await openrpcParse(jsonContent, substituteRefs);
 
       //== Determine the output format
       let outputFormat = flags.format;

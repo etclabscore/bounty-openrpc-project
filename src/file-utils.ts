@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 
+import * as JsYaml from 'js-yaml';
+
 const readJsonFile = (filePath: string): any => {
   let fileContent = '';
 
@@ -24,6 +26,30 @@ const readJsonFile = (filePath: string): any => {
   return parsedFileContent;
 };
 
+const readYamlFileAsJson = (filePath: string): any => {
+  let fileContent = '';
+
+  try {
+    const file = fs.readFileSync(filePath);
+    fileContent = file.toString();
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      throw new Error('File not found.');
+    }
+
+    throw new Error('File could not be read.');
+  }
+
+  let parsedFileContent: any;
+  try {
+    parsedFileContent = JsYaml.safeLoad(fileContent);
+  } catch (error) {
+    throw new Error(`File doesn't contain valid YAML.`);
+  }
+
+  return parsedFileContent;
+};
+
 const fileAlreadyExists = (filePath: string): boolean => {
   return fs.existsSync(filePath);
 };
@@ -36,4 +62,4 @@ const writeToFile = (filePath: string, data: any): void => {
   }
 };
 
-export { readJsonFile, fileAlreadyExists, writeToFile };
+export { readJsonFile, readYamlFileAsJson, fileAlreadyExists, writeToFile };
