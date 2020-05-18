@@ -48,9 +48,7 @@ export default class Bundle extends Command {
     const filePath = path.resolve(args.file);
 
     // Set the output path
-    const outputPath = flags.output
-      ? path.join(process.cwd(), flags.output)
-      : '';
+    const outputPath = flags.output ? path.resolve(flags.output) : '';
     const outputFileName = path.basename(outputPath);
 
     // Output to 'stdout' if the output flag is not provided
