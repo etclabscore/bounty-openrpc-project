@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import { Command, flags } from '@oclif/command';
 
+import { readYamlOrJsonFileAsJson } from '../file-utils';
 import { log } from '../logger';
 import { openrpcValidate } from '../openrpc-validator';
 
@@ -25,31 +26,19 @@ export default class Validate extends Command {
 
     const filePath = path.resolve(args.file);
 
-    let fileContent = '';
     try {
-      const file = fs.readFileSync(filePath);
-      fileContent = file.toString();
-    } catch (error) {
-      if (error?.code === 'ENOENT') {
-        log.error('File not found.');
+      // Read the specified file
+      const jsonContent = readYamlOrJsonFileAsJson(filePath);
+
+      const result = openrpcValidate(jsonContent);
+      if (result.hasErrors) {
+        console.log(result.errors);
+        this.exit(1);
       }
 
-      log.error('File could not be read.');
-    }
-
-    let parsedFileContent: any;
-    try {
-      parsedFileContent = JSON.parse(fileContent);
+      log.success('Valid!');
     } catch (error) {
-      log.error(`File doesn't contain valid JSON.`);
+      log.error(error?.message);
     }
-
-    const result = openrpcValidate(parsedFileContent);
-    if (result.hasErrors) {
-      console.log(result.errors);
-      this.exit(1);
-    }
-
-    log.success('Valid!');
   }
 }

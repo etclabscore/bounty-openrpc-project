@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 import * as JsYaml from 'js-yaml';
 
@@ -50,6 +51,24 @@ const readYamlFileAsJson = (filePath: string): any => {
   return parsedFileContent;
 };
 
+const readYamlOrJsonFileAsJson = (filePath: string): any => {
+  let jsonContent;
+  const inputFileExtension = path.extname(filePath);
+
+  switch (inputFileExtension) {
+    // If the input file's extension is either '.yaml' or '.yml', load the
+    // input file as YAML and convert it to JSON.
+    case '.yaml':
+    case '.yml':
+      jsonContent = readYamlFileAsJson(filePath);
+      break;
+    default:
+      jsonContent = readJsonFile(filePath);
+  }
+
+  return jsonContent;
+};
+
 const fileAlreadyExists = (filePath: string): boolean => {
   return fs.existsSync(filePath);
 };
@@ -62,4 +81,10 @@ const writeToFile = (filePath: string, data: any): void => {
   }
 };
 
-export { readJsonFile, readYamlFileAsJson, fileAlreadyExists, writeToFile };
+export {
+  readJsonFile,
+  readYamlFileAsJson,
+  readYamlOrJsonFileAsJson,
+  fileAlreadyExists,
+  writeToFile,
+};

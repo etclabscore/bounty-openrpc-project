@@ -11,7 +11,7 @@ import {
 import * as Ajv from 'ajv';
 import * as Inquirer from 'inquirer';
 
-import { readJsonFile } from '../file-utils';
+import { readYamlOrJsonFileAsJson } from '../file-utils';
 import { log, styledString } from '../logger';
 import { openrpcParse } from '../openrpc-parser';
 
@@ -139,10 +139,10 @@ export default class Inspect extends Command {
       process.chdir(path.dirname(filePath));
 
       // Read the specified file
-      const jsonFile = readJsonFile(filePath);
+      const jsonContent = readYamlOrJsonFileAsJson(filePath);
 
       // Parse the specified file
-      const parsedOpenRpc: any = await openrpcParse(jsonFile, true);
+      const parsedOpenRpc: any = await openrpcParse(jsonContent, true);
 
       //== Connect to server
       const { url, transport } = await this.addressFromServerObjects(

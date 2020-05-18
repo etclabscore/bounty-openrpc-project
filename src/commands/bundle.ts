@@ -5,10 +5,9 @@ import * as Inquirer from 'inquirer';
 import * as JsYaml from 'js-yaml';
 
 import {
-  readJsonFile,
+  readYamlOrJsonFileAsJson,
   fileAlreadyExists,
   writeToFile,
-  readYamlFileAsJson,
 } from '../file-utils';
 import { styledString, log } from '../logger';
 import { openrpcParse } from '../openrpc-parser';
@@ -81,20 +80,8 @@ export default class Bundle extends Command {
       // schemas inside other files.
       process.chdir(path.dirname(filePath));
 
-      //== Read the specified file
-      let jsonContent;
-      const inputFileExtension = path.extname(filePath);
-      switch (inputFileExtension) {
-        // If the input file's extension is either '.yaml' or '.yml', load the
-        // input file as YAML and convert it to JSON.
-        case '.yaml':
-        case '.yml':
-          jsonContent = readYamlFileAsJson(filePath);
-          break;
-        default:
-          jsonContent = readJsonFile(filePath);
-      }
-      //==
+      // Read the specified input file
+      const jsonContent = readYamlOrJsonFileAsJson(filePath);
 
       // Parse the specified file
       const substituteRefs = flags.substitute ? true : false;
