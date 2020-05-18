@@ -25,18 +25,16 @@ export default class Validate extends Command {
 
     const filePath = path.resolve(args.file);
 
-    let fileContent: string;
+    let fileContent = '';
     try {
       const file = fs.readFileSync(filePath);
       fileContent = file.toString();
     } catch (error) {
       if (error?.code === 'ENOENT') {
         log.error('File not found.');
-        this.exit(1);
       }
 
       log.error('File could not be read.');
-      this.exit(1);
     }
 
     let parsedFileContent: any;
@@ -44,7 +42,6 @@ export default class Validate extends Command {
       parsedFileContent = JSON.parse(fileContent);
     } catch (error) {
       log.error(`File doesn't contain valid JSON.`);
-      this.exit(1);
     }
 
     const result = openrpcValidate(parsedFileContent);

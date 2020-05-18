@@ -192,25 +192,18 @@ export default class Inspect extends Command {
         const result = await this.promptForParamValue(methodParams[i]);
         paramValues.push(result);
       }
+
+      // Make a request
+      const result = await client.request(methodName, paramValues);
+
+      // Print result
+      log.success(JSON.stringify(result, null, 2));
     } catch (error) {
       if (error?.isTtyError) {
         log.error('Prompt rendering failed.');
       } else {
         log.error(error?.message);
       }
-
-      process.exit(1);
-    }
-
-    // Make a request
-    try {
-      const result = await client.request(methodName, paramValues);
-
-      // Print result
-      log.success(JSON.stringify(result, null, 2));
-      process.exit(0);
-    } catch (error) {
-      log.error(`Request failed${error.message ? ': ' + error.message : ''}`);
     }
   }
 }

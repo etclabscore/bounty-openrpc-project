@@ -16,7 +16,8 @@ const log = {
     console.log(warnString(message));
   },
   error(message: string): void {
-    console.log(errorString(message));
+    console.error(errorString(message));
+    process.exit(1);
   },
 };
 

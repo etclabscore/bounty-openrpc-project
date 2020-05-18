@@ -75,7 +75,6 @@ export default class Bundle extends Command {
 
         if (!overwriteFile) {
           log.error('Canceled');
-          process.exit(0);
         }
       }
 
@@ -141,8 +140,6 @@ export default class Bundle extends Command {
       } else {
         log.error(error?.message);
       }
-
-      process.exit(1);
     }
   }
 }
