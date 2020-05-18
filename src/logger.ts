@@ -9,6 +9,9 @@ const log = {
   success(message: string): void {
     console.log(successString(message));
   },
+  info(message: string): void {
+    console.log(infoString(message));
+  },
   warn(message: string): void {
     console.log(warnString(message));
   },

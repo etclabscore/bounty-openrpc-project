@@ -2,7 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Command, flags } from '@oclif/command';
-import { Client, HTTPTransport, RequestManager } from '@open-rpc/client-js';
+import {
+  Client,
+  HTTPTransport,
+  WebSocketTransport,
+  RequestManager,
+} from '@open-rpc/client-js';
 import * as Ajv from 'ajv';
 import * as Inquirer from 'inquirer';
 
@@ -42,6 +47,23 @@ export default class Inspect extends Command {
     };
   }
 
+  private async promptForServerUrl(): Promise<string> {
+    const { serverUrl } = await Inquirer.prompt([
+      {
+        type: 'input',
+        name: 'serverUrl',
+        prefix: styledString.info('?'),
+        message: 'Enter URL of the server',
+        default: 'http://localhost:3000',
+        validate: (input: string): boolean => {
+          return input.length !== 0;
+        },
+      },
+    ]);
+
+    return serverUrl;
+  }
+
   private async promptForParamValue(param: {
     name: string;
     schema: object;
@@ -61,11 +83,55 @@ export default class Inspect extends Command {
     return JSON.parse(paramValue);
   }
 
+  private async addressFromServerObjects(
+    servers?: {
+      name: string;
+      url: string;
+      summary?: string;
+      description?: string;
+      variables?: Map<
+        string,
+        { default: string; enum?: string[]; description?: string }
+      >;
+    }[]
+  ): Promise<{ url: string; transport: string }> {
+    // If the array of Server objects doesn't exist in the OpenRPC document or
+    // if it is empty, prompt the user for the server's URL.
+    if (!servers || servers.length === 0) {
+      // Prompt for the server's URL
+      const url = await this.promptForServerUrl();
+
+      return { url, transport: this.protocolFromUrl(url) };
+    }
+
+    if (servers.length === 1) {
+      const { url } = servers[0];
+
+      return { url, transport: this.protocolFromUrl(url) };
+    }
+
+    // Else, if there are multiple server objects
+    log.info('Multiple server objects detected in OpenRPC document.');
+
+    // Prompt for the server's URL
+    const url = await this.promptForServerUrl();
+
+    return { url, transport: this.protocolFromUrl(url) };
+  }
+
+  private protocolFromUrl(url: string): string {
+    const parts = url.split(':/');
+    return parts[0];
+  }
+
   async run(): Promise<void> {
     const { args } = this.parse(Inspect);
 
     const filePath = path.join(process.cwd(), args.file);
 
+    let client: Client;
+    let methodName: string;
+    const paramValues: any[] = [];
     try {
       // Change the current working directory to the directory of the specified file.
       process.chdir(path.dirname(filePath));
@@ -76,19 +142,22 @@ export default class Inspect extends Command {
       // Parse the specified file
       const parsedOpenRpc: any = await openrpcParse(jsonFile, true);
 
-      // Prompt for the server's URL
-      const { serverUrl } = await Inquirer.prompt([
-        {
-          type: 'input',
-          name: 'serverUrl',
-          prefix: styledString.info('?'),
-          message: 'Enter URL of the server',
-          default: 'http://localhost:3000',
-          validate: (input: string): boolean => {
-            return input.length !== 0;
-          },
-        },
-      ]);
+      //== Connect to server
+      const { url, transport } = await this.addressFromServerObjects(
+        parsedOpenRpc.servers
+      );
+
+      log.info(`Connecting to ${url}`);
+
+      let requestManager;
+      if (transport === 'ws') {
+        requestManager = new RequestManager([new WebSocketTransport(url)]);
+      } else {
+        requestManager = new RequestManager([new HTTPTransport(url)]);
+      }
+
+      client = new Client(requestManager);
+      //==
 
       const methods = parsedOpenRpc.methods;
       if (methods.length === 0) {
@@ -97,9 +166,9 @@ export default class Inspect extends Command {
       }
 
       // Prompt for the method to call
-      const { methodName } = await Inquirer.prompt([
+      const { chosenMethodName } = await Inquirer.prompt([
         {
-          name: 'methodName',
+          name: 'chosenMethodName',
           prefix: styledString.info('?'),
           message: 'Choose method',
           type: 'list',
@@ -110,28 +179,17 @@ export default class Inspect extends Command {
           default: 0,
         },
       ]);
+      methodName = chosenMethodName;
 
       const methodParams = methods.find(
         (m: { name: string }) => m.name === methodName
       ).params;
 
       // Prompt for the param values of the method to be called
-      const paramValues: any[] = [];
       for (let i = 0; i < methodParams.length; i++) {
         const result = await this.promptForParamValue(methodParams[i]);
         paramValues.push(result);
       }
-
-      // let transport: HTTPTransport;
-      // let serverTransport = 'http';
-      const client = new Client(
-        new RequestManager([new HTTPTransport(serverUrl)])
-      );
-
-      const result = await client.request(methodName, paramValues);
-
-      // Print result
-      log.success(JSON.stringify(result, null, 2));
     } catch (error) {
       if (error?.isTtyError) {
         log.error('Prompt rendering failed.');
@@ -140,6 +198,17 @@ export default class Inspect extends Command {
       }
 
       process.exit(1);
+    }
+
+    // Make a request
+    try {
+      const result = await client.request(methodName, paramValues);
+
+      // Print result
+      log.success(JSON.stringify(result, null, 2));
+      process.exit(0);
+    } catch (error) {
+      log.error(`Request failed${error.message ? ': ' + error.message : ''}`);
     }
   }
 }
