@@ -1,5 +1,7 @@
 # openrpc-cli
 
+[![Build Workflow Status](https://github.com/habenamare/bounty-openrpc-project/workflows/Build/badge.svg)](https://github.com/habenamare/bounty-openrpc-project/actions)
+
 > a command line tool for OpenRPC
 
 # Table of Contents
