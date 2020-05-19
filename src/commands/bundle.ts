@@ -72,6 +72,7 @@ export default class Bundle extends Command {
 
         if (!overwriteFile) {
           log.error('Canceled');
+          return;
         }
       }
 

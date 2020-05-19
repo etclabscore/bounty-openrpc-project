@@ -42,6 +42,7 @@ export default class Validate extends Command {
         console.table(errors);
 
         log.error('Invalid!');
+        return;
       }
 
       log.success('Valid!');
