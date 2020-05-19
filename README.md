@@ -4,20 +4,14 @@
 
 # Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
+- [Features](#features)
 - [Usage](#usage)
   - [Bundle](#bundle)
   - [Inspect](#inspect)
   - [Validate](#validate)
 - [Dependencies](#dependencies)
 - [License](#license)
-
-# Features
-
-- Make a single OpenRPC document from multiple files that are linked via `$ref`
-- Execute JSON-RPC requests to methods defined inside an OpenRPC document
-- Validate an OpenRPC document
 
 # Installation
 
@@ -33,13 +27,24 @@ yarn          # If using `yarn`
 ./bin/run     # Run the openrpc-cli program 
 ```
 
-Pack using [pkg](https://github.com/zeit/pkg)
+Pack using [pkg](https://github.com/zeit/pkg) to create a single executable
 
 > The single executables created using `pkg` may be too big. This is because they include `Node.js`.
 
 ```bash
 pkg package.json # After running `yarn` or `npm install`
 ```
+
+<p align="center">
+  <img src="demo-gifs/installation.gif" >
+</p>
+
+# Features
+
+- Make a single OpenRPC document from multiple files that are linked via `$ref`
+- Execute JSON-RPC requests to methods defined inside an OpenRPC document
+- Validate an OpenRPC document
+- YAML support
 
 # Usage
 
