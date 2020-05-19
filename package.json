@@ -1,7 +1,7 @@
 {
   "name": "openrpc-cli",
   "version": "0.3.0",
-  "description": "an implementation of the Language Server Protocol for OpenRPC",
+  "description": "a command line tool for OpenRPC",
   "author": "Haben Amare <haben.amare@outlook.com>",
   "license": "Apache-2.0",
   "scripts": {
