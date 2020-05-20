@@ -13,7 +13,7 @@ import { styledString, log } from '../logger';
 import { openrpcParse } from '../openrpc-parser';
 
 export default class Bundle extends Command {
-  static description = '';
+  static description = 'make a single OpenRPC document by resolving $ref';
 
   static examples = [
     `$ openrpc-cli bundle root-openrpc.json
