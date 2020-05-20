@@ -15,7 +15,7 @@ import { log, styledString } from '../logger';
 import { openrpcParse } from '../openrpc-parser';
 
 export default class Inspect extends Command {
-  static description = '';
+  static description = 'make requests to methods inside an OpenRPC document';
 
   static examples = [
     `$ openrpc-cli inspect openrpc.json
