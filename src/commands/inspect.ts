@@ -7,6 +7,7 @@ import {
   WebSocketTransport,
   RequestManager,
 } from '@open-rpc/client-js';
+import { Transport } from '@open-rpc/client-js/build/transports/Transport';
 import * as Ajv from 'ajv';
 import * as Inquirer from 'inquirer';
 
@@ -82,45 +83,122 @@ export default class Inspect extends Command {
     return JSON.parse(paramValue);
   }
 
+  private protocolFromUrl(url: string): string {
+    const parts = url.split(':/');
+    return parts[0];
+  }
+
+  private variablesMap(variables?: {
+    [key: string]: { default: string; enum?: string[]; description?: string };
+  }): Map<string, { default: string; enum?: string[]; description?: string }> {
+    let variablesMap;
+
+    if (variables) {
+      variablesMap = new Map(Object.entries(variables));
+    } else {
+      variablesMap = new Map();
+    }
+
+    return variablesMap;
+  }
+
+  private resolveUrlFromVariables(
+    url: string,
+    variables: Map<
+      string,
+      { default: string; enum?: string[]; description?: string }
+    >
+  ): string {
+    const variablesFromUrl: string[] = [];
+
+    const r = /.*?\$\{(.*?)\}/g;
+    let match;
+    while ((match = r.exec(url)) !== null) {
+      variablesFromUrl.push(match[1]);
+    }
+
+    let resolvedUrl = url;
+    variablesFromUrl.forEach((v: string) => {
+      const variableValue = variables.get(v)?.default ?? '';
+
+      resolvedUrl = resolvedUrl.replace(`\$\{${v}\}`, variableValue);
+    });
+
+    return resolvedUrl;
+  }
+
   private async addressFromServerObjects(
-    servers?: {
+    servers: {
       name: string;
       url: string;
       summary?: string;
       description?: string;
-      variables?: Map<
-        string,
-        { default: string; enum?: string[]; description?: string }
-      >;
+      variables?: {
+        [name: string]: {
+          default: string;
+          enum?: string[];
+          description?: string;
+        };
+      };
     }[]
-  ): Promise<{ url: string; transport: string }> {
-    // If the array of Server objects doesn't exist in the OpenRPC document or
-    // if it is empty, prompt the user for the server's URL.
-    if (!servers || servers.length === 0) {
-      // Prompt for the server's URL
-      const url = await this.promptForServerUrl();
-
-      return { url, transport: this.protocolFromUrl(url) };
-    }
-
+  ): Promise<string> {
     if (servers.length === 1) {
-      const { url } = servers[0];
+      const { url, variables } = servers[0];
 
-      return { url, transport: this.protocolFromUrl(url) };
+      return this.resolveUrlFromVariables(url, this.variablesMap(variables));
     }
 
     // Else, if there are multiple server objects
     log.info('Multiple server objects detected in OpenRPC document.');
 
-    // Prompt for the server's URL
-    const url = await this.promptForServerUrl();
+    // Prompt for the server to use since there are multiple server objects
+    const { chosenServerResolvedUrl } = await Inquirer.prompt([
+      {
+        name: 'chosenServerResolvedUrl',
+        prefix: styledString.info('?'),
+        message: 'Choose method',
+        type: 'list',
+        choices: servers.map(
+          (s: {
+            name: string;
+            url: string;
+            variables?: {
+              [key: string]: {
+                default: string;
+                enum?: string[];
+                description?: string;
+              };
+            };
+          }) => {
+            const resolvedUrl = this.resolveUrlFromVariables(
+              s.url,
+              this.variablesMap(s.variables)
+            );
 
-    return { url, transport: this.protocolFromUrl(url) };
+            return { name: `${s.name} @ ${resolvedUrl}`, value: resolvedUrl };
+          }
+        ),
+        default: 0,
+      },
+    ]);
+
+    return chosenServerResolvedUrl;
   }
 
-  private protocolFromUrl(url: string): string {
-    const parts = url.split(':/');
-    return parts[0];
+  private async httpTransport(url: string): Promise<Transport> {
+    return new HTTPTransport(url);
+  }
+
+  private async wsTransport(url: string): Promise<Transport> {
+    return new WebSocketTransport(url);
+  }
+
+  private async transportFromUrl(url: string): Promise<Transport> {
+    if (this.protocolFromUrl(url) === 'ws') {
+      return this.wsTransport(url);
+    }
+
+    return this.httpTransport(url);
   }
 
   async run(): Promise<void> {
@@ -128,8 +206,6 @@ export default class Inspect extends Command {
 
     const filePath = path.resolve(args.file);
 
-    let client: Client;
-    let methodName: string;
     const paramValues: any[] = [];
     try {
       // Change the current working directory to the directory of the specified
@@ -143,23 +219,36 @@ export default class Inspect extends Command {
       // Parse the specified file
       const parsedOpenRpc: any = await openrpcParse(jsonContent, true);
 
-      //== Connect to server
-      const { url, transport } = await this.addressFromServerObjects(
-        parsedOpenRpc.servers
-      );
+      //== Obtain server URL
+      let url = '';
+      let connectToResolved = false;
 
-      log.info(`Connecting to ${url}`);
+      // If the array of Server objects exists in the OpenRPC document and
+      // isn't empty,
+      if (parsedOpenRpc.servers || parsedOpenRpc.servers.length > 0) {
+        url = await this.addressFromServerObjects(parsedOpenRpc.servers);
 
-      let requestManager;
-      if (transport === 'ws') {
-        requestManager = new RequestManager([new WebSocketTransport(url)]);
-      } else {
-        requestManager = new RequestManager([new HTTPTransport(url)]);
+        // Ask confirmation, to connect to the resolved URL
+        const { confirmed } = await Inquirer.prompt([
+          {
+            name: 'confirmed',
+            prefix: styledString.info('?'),
+            message: `Connect to ${url}`,
+            type: 'confirm',
+            default: true,
+          },
+        ]);
+        connectToResolved = confirmed;
       }
 
-      client = new Client(requestManager);
+      if (!connectToResolved) {
+        // Prompt for the server's URL
+        url = await this.promptForServerUrl();
+      }
       //==
 
+      //== Obtain method to connect to and the values of the chosen method's
+      //   params
       const methods = parsedOpenRpc.methods;
       if (methods.length === 0) {
         log.warn('No methods inside OpenRPC document.');
@@ -167,9 +256,9 @@ export default class Inspect extends Command {
       }
 
       // Prompt for the method to call
-      const { chosenMethodName } = await Inquirer.prompt([
+      const { methodName } = await Inquirer.prompt([
         {
-          name: 'chosenMethodName',
+          name: 'methodName',
           prefix: styledString.info('?'),
           message: 'Choose method',
           type: 'list',
@@ -180,7 +269,6 @@ export default class Inspect extends Command {
           default: 0,
         },
       ]);
-      methodName = chosenMethodName;
 
       const methodParams = methods.find(
         (m: { name: string }) => m.name === methodName
@@ -191,9 +279,18 @@ export default class Inspect extends Command {
         const result = await this.promptForParamValue(methodParams[i]);
         paramValues.push(result);
       }
+      //==
 
-      // Make a request
+      //== Connect to server and make a request
+      log.info(`Connecting to ${url}...`);
+
+      const transport = await this.transportFromUrl(url);
+
+      const requestManager = new RequestManager([transport]);
+      const client = new Client(requestManager);
+
       const result = await client.request(methodName, paramValues);
+      //==
 
       // Print result
       log.success(JSON.stringify(result, null, 2));
