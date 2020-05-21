@@ -59,14 +59,12 @@ export default class Bundle extends Command {
         const { overwriteFile } = await Inquirer.prompt([
           {
             name: 'overwriteFile',
-            prefix: styledString.warning(`${outputFileName} already exists.`),
-            message: 'Replace? [y/n]',
-            type: 'expand',
-            choices: [
-              { key: 'y', name: 'Overwrite', value: true },
-              { key: 'n', name: 'Cancel', value: false },
-            ],
-            default: 1,
+            prefix: styledString.warning(`?`),
+            message: `${styledString.info(
+              outputFileName
+            )} already exists. Do you want to overwrite file?`,
+            type: 'confirm',
+            default: false,
           },
         ]);
 
