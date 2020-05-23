@@ -18,6 +18,7 @@
     "@open-rpc/client-js": "^1.2.5",
     "ajv": "^6.12.2",
     "chalk": "^4.0.0",
+    "cli-highlight": "^2.1.4",
     "inquirer": "^7.1.0",
     "js-yaml": "^3.13.1",
     "json-schema-ref-parser": "^9.0.1",

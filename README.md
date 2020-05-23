@@ -112,6 +112,7 @@ This project is inspired by [swagger-cli](https://github.com/APIDevTools/swagger
  | :------------- | :------------- |
  | [ajv](https://github.com/ajv-validator/ajv) | MIT License |
  | [chalk](https://github.com/chalk/chalk) | MIT License |
+ | [cli-highlight](https://github.com/felixfbecker/cli-highlight) | ISC License |
  | [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) | MIT License |
  | [JS-YAML](https://github.com/nodeca/js-yaml) | MIT License |
  | [JSON Schema $Ref Parser](https://github.com/APIDevTools/json-schema-ref-parser) | MIT License |
