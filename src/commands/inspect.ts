@@ -9,6 +9,7 @@ import {
 } from '@open-rpc/client-js';
 import { Transport } from '@open-rpc/client-js/build/transports/Transport';
 import * as Ajv from 'ajv';
+import * as CliHighlight from 'cli-highlight';
 import * as Inquirer from 'inquirer';
 
 import { readYamlOrJsonFileAsJson } from '../file-utils';
@@ -290,10 +291,11 @@ export default class Inspect extends Command {
       const client = new Client(requestManager);
 
       const result = await client.request(methodName, paramValues);
+      const resultString = JSON.stringify(result, null, 2);
       //==
 
-      // Print result
-      log.success(JSON.stringify(result, null, 2));
+      // Highlight and print result
+      console.log(CliHighlight.highlight(resultString, { language: 'json' }));
     } catch (error) {
       if (error?.isTtyError) {
         log.error('Prompt rendering failed.');
