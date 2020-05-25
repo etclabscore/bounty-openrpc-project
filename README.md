@@ -29,6 +29,10 @@ yarn          # If using `yarn`
 ./bin/run     # Run the openrpc-cli program 
 ```
 
+<p align="center">
+  <img src="demo-gifs/installation.gif" width="700px" >
+</p>
+
 ## Pack using [pkg](https://github.com/zeit/pkg) to create a single executable
 
 > The single executables created using `pkg` may be too big. This is because they include `Node.js`.
@@ -39,10 +43,6 @@ yarn build    # If using `yarn`
 
 pkg package.json # After running `yarn` or `npm install`
 ```
-
-<p align="center">
-  <img src="demo-gifs/installation.gif" width="700px" >
-</p>
 
 # Features
 
