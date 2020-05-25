@@ -34,6 +34,9 @@ yarn          # If using `yarn`
 > The single executables created using `pkg` may be too big. This is because they include `Node.js`.
 
 ```bash
+npm run build # If using `npm`
+yarn build    # If using `yarn`
+
 pkg package.json # After running `yarn` or `npm install`
 ```
 
