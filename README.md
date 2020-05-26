@@ -101,6 +101,10 @@ $ openrpc-cli bundle -s -f yaml -o output.yaml root-openrpc.json
 $ openrpc-cli inspect FILE
 ```
 
+<p align="center">
+  <img src="demo-gifs/inspect.gif" width="700px" >
+</p>
+
 When connecting to a server, the following protocols are supported. 
   - HTTP/HTTPS
   - WebSocket
@@ -112,6 +116,10 @@ When connecting to a server, the following protocols are supported.
 ```bash
 $ openrpc-cli validate FILE
 ```
+
+<p align="center">
+  <img src="demo-gifs/validate.gif" width="700px" >
+</p>
 
 # Dependencies
 
