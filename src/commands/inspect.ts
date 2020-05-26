@@ -186,20 +186,12 @@ export default class Inspect extends Command {
     return chosenServerResolvedUrl;
   }
 
-  private async httpTransport(url: string): Promise<Transport> {
-    return new HTTPTransport(url);
-  }
-
-  private async wsTransport(url: string): Promise<Transport> {
-    return new WebSocketTransport(url);
-  }
-
-  private async transportFromUrl(url: string): Promise<Transport> {
+  private transportFromUrl(url: string): Transport {
     if (this.protocolFromUrl(url) === 'ws') {
-      return this.wsTransport(url);
+      return new WebSocketTransport(url);
     }
 
-    return this.httpTransport(url);
+    return new HTTPTransport(url);
   }
 
   async run(): Promise<void> {
@@ -285,7 +277,7 @@ export default class Inspect extends Command {
       //== Connect to server and make a request
       log.info(`Connecting to ${url}...`);
 
-      const transport = await this.transportFromUrl(url);
+      const transport = this.transportFromUrl(url);
 
       const requestManager = new RequestManager([transport]);
       const client = new Client(requestManager);
