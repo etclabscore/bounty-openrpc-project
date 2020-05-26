@@ -194,12 +194,63 @@ export default class Inspect extends Command {
     return new HTTPTransport(url);
   }
 
+  private async obtainMethodNameAndParamValues(
+    parsedOpenRpc: any
+  ): Promise<{ methodName: string; paramValues: any[] }> {
+    const methods = parsedOpenRpc.methods;
+    if (methods.length === 0) {
+      log.warn('No methods inside OpenRPC document.');
+      process.exit(0);
+    }
+
+    // Prompt for the method to call
+    const { methodName } = await Inquirer.prompt([
+      {
+        name: 'methodName',
+        prefix: styledString.info('?'),
+        message: 'Choose method',
+        type: 'list',
+        choices: methods.map((m: { name: string }) => ({
+          name: m.name,
+          value: m.name,
+        })),
+        default: 0,
+      },
+    ]);
+
+    const methodParams = methods.find(
+      (m: { name: string }) => m.name === methodName
+    ).params;
+
+    const paramValues: any[] = [];
+    // Prompt for the param values of the method to be called
+    for (let i = 0; i < methodParams.length; i++) {
+      const result = await this.promptForParamValue(methodParams[i]);
+      paramValues.push(result);
+    }
+
+    return { methodName, paramValues };
+  }
+
+  private async callMethod(client: Client, parsedOpenRpc: any): Promise<void> {
+    // Obtain method to connect to and the values of the chosen method's params
+    const {
+      methodName,
+      paramValues,
+    } = await this.obtainMethodNameAndParamValues(parsedOpenRpc);
+
+    const result = await client.request(methodName, paramValues);
+    const resultString = JSON.stringify(result, null, 2);
+
+    // Highlight and print result
+    console.log(CliHighlight.highlight(resultString, { language: 'json' }));
+  }
+
   async run(): Promise<void> {
     const { args } = this.parse(Inspect);
 
     const filePath = path.resolve(args.file);
 
-    const paramValues: any[] = [];
     try {
       // Change the current working directory to the directory of the specified
       // file. This is necessary for resolving $ref pointers that reference
@@ -240,54 +291,39 @@ export default class Inspect extends Command {
       }
       //==
 
-      //== Obtain method to connect to and the values of the chosen method's
-      //   params
-      const methods = parsedOpenRpc.methods;
-      if (methods.length === 0) {
-        log.warn('No methods inside OpenRPC document.');
-        process.exit(0);
-      }
-
-      // Prompt for the method to call
-      const { methodName } = await Inquirer.prompt([
-        {
-          name: 'methodName',
-          prefix: styledString.info('?'),
-          message: 'Choose method',
-          type: 'list',
-          choices: methods.map((m: { name: string }) => ({
-            name: m.name,
-            value: m.name,
-          })),
-          default: 0,
-        },
-      ]);
-
-      const methodParams = methods.find(
-        (m: { name: string }) => m.name === methodName
-      ).params;
-
-      // Prompt for the param values of the method to be called
-      for (let i = 0; i < methodParams.length; i++) {
-        const result = await this.promptForParamValue(methodParams[i]);
-        paramValues.push(result);
-      }
-      //==
-
-      //== Connect to server and make a request
+      //== Connect to server
       log.info(`Connecting to ${url}...`);
 
       const transport = this.transportFromUrl(url);
 
       const requestManager = new RequestManager([transport]);
       const client = new Client(requestManager);
-
-      const result = await client.request(methodName, paramValues);
-      const resultString = JSON.stringify(result, null, 2);
       //==
 
-      // Highlight and print result
-      console.log(CliHighlight.highlight(resultString, { language: 'json' }));
+      for (;;) {
+        // Make a request
+        await this.callMethod(client, parsedOpenRpc);
+
+        const { nextAction } = await Inquirer.prompt([
+          {
+            name: 'nextAction',
+            prefix: styledString.info('?'),
+            message: 'Again?',
+            type: 'expand',
+            choices: [
+              { key: 'c', name: 'Call another method', value: 'c' },
+              { key: 'q', name: 'End', value: 'q' },
+            ],
+          },
+        ]);
+
+        switch (nextAction) {
+          case 'c':
+            continue;
+          case 'q':
+            process.exit(0);
+        }
+      }
     } catch (error) {
       if (error?.isTtyError) {
         log.error('Prompt rendering failed.');
