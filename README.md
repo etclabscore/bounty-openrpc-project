@@ -56,29 +56,41 @@ pkg package.json # After running `yarn` or `npm install`
 > Use the `help` command or the `--help` option to get more info about the commands and their options.
 
 ```bash
-openrpc-cli [COMMAND] [OPTIONS]
-
-openrpc-cli help [COMMAND]
+openrpc-cli COMMAND [OPTIONS] FILE
 ```
 
+**FILE** can be either a *JSON* file or a *YAML* file with a `yaml` or `yml` extension.
 ## Bundle
 
 > Make a single OpenRPC document from multiple files that are linked via `$ref`
 
 ```bash
-openrpc-cli bundle root-openrpc.json
+$ openrpc-cli bundle FILE
 ```
 
 ### Options
 
 ```
+  -f, --format=json|yaml  the output format [default: json]
+  -o, --output=<file>     place the output into <file> [default: stdout]
+  -s, --substitute        substitute $ref pointers with their resolved value
 ```
 
 ### Examples
 
 ```
-openrpc-cli bundle root-openrpc.json                      
-openrpc-cli bundle root-openrpc.yaml
+$ openrpc-cli bundle root-openrpc.json > output.json
+$ openrpc-cli bundle root-openrpc.yaml > output.json
+$ openrpc-cli bundle root-openrpc.yml > output.json
+
+$ openrpc-cli bundle -f yaml root-openrpc.json > output.yaml
+
+$ openrpc-cli bundle -o output.json root-openrpc.json
+$ openrpc-cli bundle -f yaml -o output.yaml root-openrpc.json
+
+$ openrpc-cli bundle -s root-openrpc.json
+$ openrpc-cli bundle -s -f yaml root-openrpc.json
+$ openrpc-cli bundle -s -f yaml -o output.yaml root-openrpc.json
 ```
 
 ## Inspect
@@ -86,25 +98,19 @@ openrpc-cli bundle root-openrpc.yaml
 > Execute JSON-RPC requests to methods defined inside an OpenRPC document
 
 ```bash
-openrpc-cli inspect openrpc.json
+$ openrpc-cli inspect FILE
 ```
 
-### Options
-
-```
-```
+When connecting to a server, the following protocols are supported. 
+  - HTTP/HTTPS
+  - WebSocket
 
 ## Validate
 
 > Validate an OpenRPC document
 
 ```bash
-openrpc-cli validate openrpc.json
-```
-
-### Options
-
-```
+$ openrpc-cli validate FILE
 ```
 
 # Dependencies
