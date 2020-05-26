@@ -30,7 +30,7 @@ yarn          # If using `yarn`
 ```
 
 <p align="center">
-  <img src="demo-gifs/installation.gif" width="700px" >
+  <img src="demo-gifs/running-from-source.gif" width="700px" >
 </p>
 
 ## Pack using [pkg](https://github.com/zeit/pkg) to create a single executable
