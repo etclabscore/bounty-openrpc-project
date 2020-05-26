@@ -72,7 +72,7 @@ $ openrpc-cli bundle FILE
 
 ```
   -f, --format=json|yaml  the output format [default: json]
-  -o, --output=<file>     place the output into <file> [default: stdout]
+  -o, --output=<file>     place the output into <file>, the default output is 'stdout'
   -s, --substitute        substitute $ref pointers with their resolved value
 ```
 

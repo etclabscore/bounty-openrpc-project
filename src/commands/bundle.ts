@@ -25,7 +25,7 @@ export default class Bundle extends Command {
     output: flags.string({
       char: 'o',
       helpValue: '<file>',
-      description: 'place the output into <file>',
+      description: `place the output into <file>, the default output is 'stdout'`,
     }),
     format: flags.string({
       default: 'json',
