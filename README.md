@@ -1,52 +1,142 @@
-# Pristine
+# openrpc-cli
 
-Pristine is an open source repository in its original condition.
+[![Build Workflow Status](https://github.com/habenamare/bounty-openrpc-project/workflows/Build/badge.svg)](https://github.com/habenamare/bounty-openrpc-project/actions)
 
-There are a lack of repositories to start from to build community driven open source projects. Pristine is a starting point, it follows a Documentation Driven Development approach, and can be used as a resource to augment existing documentation.
+> a command line tool for OpenRPC
 
-## How to use Pristine in your project
+# Table of Contents
 
-There are 2 options for using pristine with your project. 
-1. Fork this repo as the start of your own, OR
-2. [follow these instructions](https://thoughts.t37.net/merging-2-different-git-repositories-without-losing-your-history-de7a06bba804) to use it on an existing repository.
+- [Installation](#installation)
+- [Features](#features)
+- [Usage](#usage)
+  - [Bundle](#bundle)
+  - [Inspect](#inspect)
+  - [Validate](#validate)
+- [Dependencies](#dependencies)
+- [License](#license)
 
-## Documentation Driven Development
+# Installation
 
-There are many ways to drive open source development. Documenting the problem in the README gives a middle ground between technical and non-technical specifications. This allows organizing solutions to this challenge around community and documentation.
+## Running from source
 
-> [...] a beautifully crafted library with no documentation is also damn near worthless. If your software solves the wrong problem or nobody can figure out how to use it, there’s something very bad going on.
+```bash
+git clone https://github.com/habenamare/bounty-openrpc-project
+cd bounty-openrpc-project
 
-- [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html) by Tom Preson-Werner
+npm install   # If using `npm`
+yarn          # If using `yarn`
 
-### Conventions and Specifications 
+./bin/run     # Run the openrpc-cli program 
+```
 
-Using conventions, documentation and specifications make it easier to:
-- communicate the problem you are solving
-- ease onboarding
-- build and use composable tools
-- promote open source contribution and engagement
-- promote issue and feature discussion on Github itself
+<p align="center">
+  <img src="demo-gifs/running-from-source.gif" width="700px" >
+</p>
 
-#### Resources
+## Pack using [pkg](https://github.com/zeit/pkg) to create a single executable
 
-- [opensource.guide](https://opensource.guide/)
-- [Github community profiles for public repositories](https://help.github.com/articles/about-community-profiles-for-public-repositories/)
-- [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html)
-- [pengwynn/flint](https://github.com/pengwynn/flint)
-- [Working Backwards](https://www.allthingsdistributed.com/2006/11/working_backwards.html)
-- [Literate programming](https://en.wikipedia.org/wiki/Literate_programming)
-- [Hammock Driven Development](https://www.youtube.com/watch?v=f84n5oFoZBc)
-- [Inversion and The Power of Avoiding Stupidity](https://fs.blog/2013/10/inversion/)
-- [choosealicense.com](http://choosealicense.com)
-- [The Documentation Compendium](https://github.com/kylelobo/The-Documentation-Compendium)
+> The single executables created using `pkg` may be too big. This is because they include `Node.js`.
 
-## Getting Started
+```bash
+npm run build # If using `npm`
+yarn build    # If using `yarn`
 
-To get started, [fork](https://help.github.com/articles/fork-a-repo/) or [duplicate](https://help.github.com/articles/duplicating-a-repository/) the repository. Then edit this file and delete everything above this line.
+pkg package.json # After running `yarn` or `npm install`
+```
 
----
+# Features
 
-### Contributing
+- Make a single OpenRPC document from multiple files that are linked via `$ref`
+- Execute JSON-RPC requests to methods defined inside an OpenRPC document
+- Validate an OpenRPC document
+- YAML support
 
-How to contribute, build and release are outlined in [CONTRIBUTING.md](CONTRIBUTING.md), [BUILDING.md](BUILDING.md) and [RELEASING.md](RELEASING.md) respectively. Commits in this repository follow the [CONVENTIONAL_COMMITS.md](CONVENTIONAL_COMMITS.md) specification.
+# Usage
 
+> Use the `help` command or the `--help` option to get more info about the commands and their options.
+
+```bash
+openrpc-cli COMMAND [OPTIONS] FILE
+```
+
+**FILE** can be either a *JSON* file or a *YAML* file with a `yaml` or `yml` extension.
+## Bundle
+
+> Make a single OpenRPC document from multiple files that are linked via `$ref`
+
+```bash
+$ openrpc-cli bundle FILE
+```
+
+### Options
+
+```
+  -f, --format=json|yaml  the output format [default: json]
+  -o, --output=<file>     place the output into <file>, the default output is 'stdout'
+  -s, --substitute        substitute $ref pointers with their resolved value
+```
+
+### Examples
+
+```
+$ openrpc-cli bundle root-openrpc.json > output.json
+$ openrpc-cli bundle root-openrpc.yaml > output.json
+$ openrpc-cli bundle root-openrpc.yml > output.json
+
+$ openrpc-cli bundle -f yaml root-openrpc.json > output.yaml
+
+$ openrpc-cli bundle -o output.json root-openrpc.json
+$ openrpc-cli bundle -f yaml -o output.yaml root-openrpc.json
+
+$ openrpc-cli bundle -s root-openrpc.json
+$ openrpc-cli bundle -s -f yaml root-openrpc.json
+$ openrpc-cli bundle -s -f yaml -o output.yaml root-openrpc.json
+```
+
+## Inspect
+
+> Execute JSON-RPC requests to methods defined inside an OpenRPC document
+
+```bash
+$ openrpc-cli inspect FILE
+```
+
+<p align="center">
+  <img src="demo-gifs/inspect.gif" width="700px" >
+</p>
+
+When connecting to a server, the following protocols are supported. 
+  - HTTP/HTTPS
+  - WebSocket
+
+## Validate
+
+> Validate an OpenRPC document
+
+```bash
+$ openrpc-cli validate FILE
+```
+
+<p align="center">
+  <img src="demo-gifs/validate.gif" width="700px" >
+</p>
+
+# Dependencies
+
+This project is inspired by [swagger-cli](https://github.com/APIDevTools/swagger-cli) and it makes use of the following great open-source libraries (in alphabetical order).
+
+ | Dependency  | License |
+ | :------------- | :------------- |
+ | [ajv](https://github.com/ajv-validator/ajv) | MIT License |
+ | [chalk](https://github.com/chalk/chalk) | MIT License |
+ | [cli-highlight](https://github.com/felixfbecker/cli-highlight) | ISC License |
+ | [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) | MIT License |
+ | [JS-YAML](https://github.com/nodeca/js-yaml) | MIT License |
+ | [JSON Schema $Ref Parser](https://github.com/APIDevTools/json-schema-ref-parser) | MIT License |
+ | [oclif](https://github.com/oclif/oclif) | MIT License |
+ | [OpenRPC Client JS](https://github.com/open-rpc/client-js) | Apache License 2.0 |
+ | [tslib](https://github.com/Microsoft/tslib) | BSD Zero Clause License |
+
+# License
+
+This project is under the Apache License 2.0.

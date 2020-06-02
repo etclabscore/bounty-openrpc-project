@@ -1,0 +1,79 @@
+{
+  "name": "openrpc-cli",
+  "version": "0.3.0",
+  "description": "a command line tool for OpenRPC",
+  "author": "Haben Amare <haben.amare@outlook.com>",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "postpack": "rm -f oclif.manifest.json",
+    "lint": "eslint . --ext \"ts, js\" --config .eslintrc.js",
+    "test": "jest",
+    "posttest": "yarn run lint"
+  },
+  "dependencies": {
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/plugin-help": "^3",
+    "@open-rpc/client-js": "^1.2.5",
+    "ajv": "^6.12.2",
+    "chalk": "^4.0.0",
+    "cli-highlight": "^2.1.4",
+    "inquirer": "^7.1.0",
+    "js-yaml": "^3.13.1",
+    "json-schema-ref-parser": "^9.0.1",
+    "tslib": "^1"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1",
+    "@oclif/test": "^1",
+    "@types/inquirer": "^6.5.0",
+    "@types/jest": "^25.2.2",
+    "@types/js-yaml": "^3.12.4",
+    "@types/node": "^10",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "chai": "^4.2.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.1",
+    "globby": "^10",
+    "jest": "^26.0.1",
+    "prettier": "1.19.1",
+    "ts-jest": "^26.0.0",
+    "ts-node": "^8",
+    "typescript": "^3.3"
+  },
+  "bin": {
+    "openrpc-cli": "./bin/run"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "homepage": "https://github.com/habenamare/openrpc-cli",
+  "keywords": [
+    "oclif"
+  ],
+  "main": "lib/index.js",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "openrpc-cli",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "habenamare/openrpc-cli",
+  "bugs": "https://github.com/habenamare/openrpc-cli/issues",
+  "types": "lib/index.d.ts",
+  "pkg": {
+    "scripts": "./lib/**/*.js"
+  }
+}
