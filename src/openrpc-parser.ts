@@ -9,14 +9,14 @@ const openrpcParse = async (
   substituteRefs = true
 ): Promise<object> => {
   // Validate
-  const { valid, hasErrors } = openrpcValidate(data);
-  if (!valid) {
-    if (hasErrors) {
-      throw new Error('Invalid OpenRPC document.');
-    }
+  // const { valid, hasErrors } = openrpcValidate(data);
+  // if (!valid) {
+  //   if (hasErrors) {
+  //     throw new Error('Invalid OpenRPC document.');
+  //   }
 
-    throw new Error('Invalid data.');
-  }
+  //   throw new Error('Invalid data.');
+  // }
 
   // If 'substituteRefs' is set to `true`, each reference ($ref) will be
   // substituted with its resolved value. Otherwise, if 'substituteRefs' is set
