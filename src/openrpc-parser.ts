@@ -1,22 +1,22 @@
-import * as JsonSchemaRefParser from 'json-schema-ref-parser';
+import * as $RefParser from 'json-schema-ref-parser';
 
 import { openrpcValidate } from './openrpc-validator';
 
-const refParser = new JsonSchemaRefParser();
+const refParser = new $RefParser();
 
 const openrpcParse = async (
   data: any,
   substituteRefs = true
 ): Promise<object> => {
   // Validate
-  // const { valid, hasErrors } = openrpcValidate(data);
-  // if (!valid) {
-  //   if (hasErrors) {
-  //     throw new Error('Invalid OpenRPC document.');
-  //   }
+  const { valid, hasErrors } = openrpcValidate(data);
+  if (!valid) {
+    if (hasErrors) {
+      throw new Error('Invalid OpenRPC document.');
+    }
 
-  //   throw new Error('Invalid data.');
-  // }
+    throw new Error('Invalid data.');
+  }
 
   // If 'substituteRefs' is set to `true`, each reference ($ref) will be
   // substituted with its resolved value. Otherwise, if 'substituteRefs' is set

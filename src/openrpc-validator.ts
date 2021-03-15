@@ -1,5 +1,5 @@
 import * as Ajv from 'ajv';
-import * as openRpcSchema from './openrpc-meta-schema/1.11.0/open-rpc-meta-schema.json';
+import * as schema from '@open-rpc/meta-schema';
 
 const ajv = new Ajv({
   allErrors: true,
@@ -9,7 +9,7 @@ const ajv = new Ajv({
   missingRefs: 'ignore',
 });
 
-const ajvValidate = ajv.compile(openRpcSchema);
+const ajvValidate = ajv.compile(schema);
 
 const openrpcValidate = (
   data: any

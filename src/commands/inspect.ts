@@ -239,7 +239,10 @@ export default class Inspect extends Command {
       paramValues,
     } = await this.obtainMethodNameAndParamValues(parsedOpenRpc);
 
-    const result = await client.request({method: methodName, params: paramValues});
+    const result = await client.request({
+      method: methodName,
+      params: paramValues,
+    });
     const resultString = JSON.stringify(result, null, 2);
 
     // Highlight and print result

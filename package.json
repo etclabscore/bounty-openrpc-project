@@ -1,29 +1,29 @@
 {
-  "name": "openrpc-cli",
-  "version": "0.3.0",
-  "description": "a command line tool for OpenRPC",
+  "name": "@xops.net/openrpc-cli",
+  "version": "0.0.0-development",
+  "description": "A command line tool for OpenRPC",
   "author": "Haben Amare <haben.amare@outlook.com>",
   "license": "Apache-2.0",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "prepack": "rm -rf build && tsc -b && oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --ext \"ts, js\" --config .eslintrc.js",
     "test": "jest",
-    "posttest": "yarn run lint"
+    "posttest": "npm run lint"
   },
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
     "@open-rpc/client-js": "^1.2.5",
+    "@open-rpc/meta-schema": "^1.14.1",
     "ajv": "^6.12.2",
     "chalk": "^4.0.0",
     "cli-highlight": "^2.1.4",
     "inquirer": "^7.1.0",
     "js-yaml": "^3.13.1",
-    "json-schema-ref-parser": "^9.0.1",
-    "tslib": "^1"
+    "json-schema-ref-parser": "^9.0.1"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",
@@ -44,7 +44,7 @@
     "prettier": "1.19.1",
     "ts-jest": "^26.0.0",
     "ts-node": "^8",
-    "typescript": "^3.3"
+    "typescript": "^3.9.7"
   },
   "bin": {
     "openrpc-cli": "./bin/run"
@@ -54,26 +54,26 @@
   },
   "files": [
     "/bin",
-    "/lib",
+    "/build",
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/habenamare/openrpc-cli",
+  "homepage": "https://github.com/xops/openrpc-cli",
   "keywords": [
     "oclif"
   ],
-  "main": "lib/index.js",
+  "main": "build/index.js",
   "oclif": {
-    "commands": "./lib/commands",
+    "commands": "./build/commands",
     "bin": "openrpc-cli",
     "plugins": [
       "@oclif/plugin-help"
     ]
   },
-  "repository": "habenamare/openrpc-cli",
-  "bugs": "https://github.com/habenamare/openrpc-cli/issues",
-  "types": "lib/index.d.ts",
+  "repository": "xops/openrpc-cli",
+  "bugs": "https://github.com/xops/openrpc-cli/issues",
+  "types": "build/index.d.ts",
   "pkg": {
-    "scripts": "./lib/**/*.js"
+    "scripts": "./build/**/*.js"
   }
 }

@@ -1,7 +1,5 @@
 # openrpc-cli
 
-[![Build Workflow Status](https://github.com/habenamare/bounty-openrpc-project/workflows/Build/badge.svg)](https://github.com/habenamare/bounty-openrpc-project/actions)
-
 > a command line tool for OpenRPC
 
 # Table of Contents
@@ -26,7 +24,7 @@ cd bounty-openrpc-project
 npm install   # If using `npm`
 yarn          # If using `yarn`
 
-./bin/run     # Run the openrpc-cli program 
+./bin/run     # Run the openrpc-cli program
 ```
 
 <p align="center">
@@ -105,7 +103,7 @@ $ openrpc-cli inspect FILE
   <img src="demo-gifs/inspect.gif" width="700px" >
 </p>
 
-When connecting to a server, the following protocols are supported. 
+When connecting to a server, the following protocols are supported.
   - HTTP/HTTPS
   - WebSocket
 
@@ -135,8 +133,11 @@ This project is inspired by [swagger-cli](https://github.com/APIDevTools/swagger
  | [JSON Schema $Ref Parser](https://github.com/APIDevTools/json-schema-ref-parser) | MIT License |
  | [oclif](https://github.com/oclif/oclif) | MIT License |
  | [OpenRPC Client JS](https://github.com/open-rpc/client-js) | Apache License 2.0 |
- | [tslib](https://github.com/Microsoft/tslib) | BSD Zero Clause License |
 
 # License
 
 This project is under the Apache License 2.0.
+
+# Notes
+
+This project was forked from [https://github.com/etclabscore/bounty-openrpc-project](https://github.com/etclabscore/bounty-openrpc-project) and was authored by: https://github.com/habenamar
