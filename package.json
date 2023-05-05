@@ -16,7 +16,7 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^3",
-    "@open-rpc/client-js": "^1.2.5",
+    "@open-rpc/client-js": "^1.8.1",
     "ajv": "^6.12.2",
     "chalk": "^4.0.0",
     "cli-highlight": "^2.1.4",
